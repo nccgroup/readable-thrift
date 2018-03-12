@@ -1,0 +1,70 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+
+    dependencies {
+        classpath 'com.github.jengelman.gradle.plugins:shadow:2.0.+'
+    }
+}
+
+apply plugin: 'java-library'
+apply plugin: 'idea'
+apply plugin: 'maven-publish'
+apply plugin: 'com.github.johnrengelman.shadow'
+
+group = 'trust.nccgroup'
+version = '0.1.0'
+
+description = """Thrift Binary Message Decoder"""
+
+sourceCompatibility = 1.7
+targetCompatibility = 1.7
+
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    api group: 'org.apache.thrift', name: 'libthrift', version:'0.9.3'
+    api group: 'org.json', name: 'json', version:'20160810'
+
+    testImplementation group: 'org.skyscreamer', name: 'jsonassert', version:'1.4.0'
+    testImplementation group: 'junit', name: 'junit', version:'4.12'
+}
+
+jar {
+    manifest {
+        attributes (
+                "Main-Class": "trust.nccgroup.readablethrift.InteractiveCodec",
+                "Manifest-Version": "1.0",
+        )
+    }
+}
+
+task sourceJar(type: Jar) {
+    from sourceSets.main.allJava
+}
+
+task javadocJar(type: Jar) {
+    from javadoc
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+
+            artifact sourceJar {
+                classifier "sources"
+            }
+
+            artifact javadocJar {
+                classifier = 'javadoc'
+            }
+        }
+    }
+}
+
+defaultTasks 'shadowJar'
