@@ -10,7 +10,8 @@ buildscript {
 
 apply plugin: 'java-library'
 apply plugin: 'idea'
-apply plugin: 'maven-publish'
+apply plugin: 'maven'
+apply plugin: 'signing'
 apply plugin: 'com.github.johnrengelman.shadow'
 
 group = 'trust.nccgroup'
@@ -53,38 +54,50 @@ task javadocJar(type: Jar) {
     classifier = 'javadoc'
 }
 
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            from components.java
+artifacts {
+    archives javadocJar, sourceJar
+}
 
-            artifact sourceJar
-            artifact javadocJar
+signing {
+    sign configurations.archives
+}
 
-            pom.withXml {
-                asNode().children().last() + {
-                    resolveStrategy = Closure.DELEGATE_FIRST
-                    name 'Readable Thrift'
-                    description description
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+                authentication(userName: sonatypeUsername, password: sonatypePassword)
+            }
+
+            snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+                authentication(userName: sonatypeUsername, password: sonatypePassword)
+            }
+
+            pom.project {
+                name 'Readable Thrift'
+                packaging 'jar'
+                description description
+                url 'https://github.com/nccgroup/readable-thrift'
+                scm {
                     url 'https://github.com/nccgroup/readable-thrift'
-                    scm {
-                        url 'https://github.com/nccgroup/readable-thrift'
-                        connection 'scm:git:git://github.com/nccgroup/readable-thrift.git'
-                        developerConnection 'scm:git:ssh:git@github.com:nccgroup/readable-thrift.git'
+                    connection 'scm:git:git://github.com/nccgroup/readable-thrift.git'
+                    developerConnection 'scm:git:ssh:git@github.com:nccgroup/readable-thrift.git'
+                }
+                licenses {
+                    license {
+                        name 'The Apache Software License, Version 2.0'
+                        url 'http://www.apache.org/license/LICENSE-2.0.txt'
+                        distribution 'repo'
                     }
-                    licenses {
-                        license {
-                            name 'The Apache Software License, Version 2.0'
-                            url 'http://www.apache.org/license/LICENSE-2.0.txt'
-                            distribution 'repo'
-                        }
-                    }
-                    developers {
-                        developer {
-                            id 'jamchamb'
-                            name 'James Chambers'
-                            email 'james.chambers@nccgroup.trust'
-                        }
+                }
+                developers {
+                    developer {
+                        id 'jamchamb'
+                        name 'James Chambers'
+                        email 'james.chambers@nccgroup.trust'
                     }
                 }
             }
