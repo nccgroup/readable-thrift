@@ -14,7 +14,7 @@ apply plugin: 'maven-publish'
 apply plugin: 'com.github.johnrengelman.shadow'
 
 group = 'trust.nccgroup'
-version = '0.1.0'
+version = '1.0.0'
 
 description = """Thrift Binary Message Decoder"""
 

@@ -53,7 +53,7 @@ $ ./gradlew
 
 BUILD SUCCESSFUL in 1s
 2 actionable tasks: 2 executed
-$ java -jar build/libs/readablethrift-0.1.0-all.jar 
+$ java -jar build/libs/readablethrift-1.0.0-all.jar 
 Enter Base64 encoded message or JSON object (or q to quit): 
 ```
 
