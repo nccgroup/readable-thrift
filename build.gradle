@@ -16,7 +16,7 @@ apply plugin: 'com.github.johnrengelman.shadow'
 group = 'trust.nccgroup'
 version = '1.0.0'
 
-description = """Thrift Binary Message Decoder"""
+description = """Human-friendly Thrift encoder/decoder"""
 
 sourceCompatibility = 1.7
 targetCompatibility = 1.7
@@ -45,10 +45,12 @@ jar {
 
 task sourceJar(type: Jar) {
     from sourceSets.main.allJava
+    classifier = 'sources'
 }
 
 task javadocJar(type: Jar) {
     from javadoc
+    classifier = 'javadoc'
 }
 
 publishing {
@@ -56,12 +58,35 @@ publishing {
         mavenJava(MavenPublication) {
             from components.java
 
-            artifact sourceJar {
-                classifier "sources"
-            }
+            artifact sourceJar
+            artifact javadocJar
 
-            artifact javadocJar {
-                classifier = 'javadoc'
+            pom.withXml {
+                asNode().children().last() + {
+                    resolveStrategy = Closure.DELEGATE_FIRST
+                    name 'Readable Thrift'
+                    description description
+                    url 'https://github.com/nccgroup/readable-thrift'
+                    scm {
+                        url 'https://github.com/nccgroup/readable-thrift'
+                        connection 'scm:git:git://github.com/nccgroup/readable-thrift.git'
+                        developerConnection 'scm:git:ssh:git@github.com:nccgroup/readable-thrift.git'
+                    }
+                    licenses {
+                        license {
+                            name 'The Apache Software License, Version 2.0'
+                            url 'http://www.apache.org/license/LICENSE-2.0.txt'
+                            distribution 'repo'
+                        }
+                    }
+                    developers {
+                        developer {
+                            id 'jamchamb'
+                            name 'James Chambers'
+                            email 'james.chambers@nccgroup.trust'
+                        }
+                    }
+                }
             }
         }
     }
